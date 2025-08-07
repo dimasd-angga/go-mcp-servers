@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: mcptest
+      POSTGRES_PASSWORD: mcptest
+      POSTGRES_DB: mcptest
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mcptest"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  mcp-filesystem:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.template
+      args:
+        SERVER: filesystem
+    environment:
+      FS_ROOT: /workspace
+      FS_ALLOW_DELETE: "false"
+      LOG_LEVEL: info
+    volumes:
+      - ${WORKSPACE_PATH:-/tmp/mcp-workspace}:/workspace
+    stdin_open: true
+
+  mcp-postgres:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.template
+      args:
+        SERVER: postgres
+    environment:
+      POSTGRES_DSN: postgres://mcptest:mcptest@postgres:5432/mcptest?sslmode=disable
+      PG_ALLOW_WRITE: "false"
+      LOG_LEVEL: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+    stdin_open: true
+
+  mcp-shell:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.template
+      args:
+        SERVER: shell
+    environment:
+      SHELL_WORKDIR: /workspace
+      SHELL_TIMEOUT: "60"
+      LOG_LEVEL: info
+    volumes:
+      - ${WORKSPACE_PATH:-/tmp/mcp-workspace}:/workspace
+    stdin_open: true
+
+  mcp-redis:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.template
+      args:
+        SERVER: redis
+    environment:
+      REDIS_ADDR: redis:6379
+      LOG_LEVEL: info
+    depends_on:
+      redis:
+        condition: service_healthy
+    stdin_open: true

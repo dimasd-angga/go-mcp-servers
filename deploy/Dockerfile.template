@@ -1,0 +1,22 @@
+# Multi-stage build. Use:
+#   docker build -f deploy/Dockerfile.template --build-arg SERVER=<name> -t go-mcp-servers/<name> .
+
+ARG SERVER
+
+FROM golang:1.23-alpine AS builder
+ARG SERVER
+WORKDIR /src
+COPY go.work go.work
+COPY shared/ shared/
+COPY servers/ servers/
+WORKDIR /src/servers/${SERVER}
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/mcp-${SERVER} .
+
+FROM alpine:3.20
+ARG SERVER
+RUN apk add --no-cache ca-certificates && \
+    addgroup -g 65532 mcp && \
+    adduser -D -u 65532 -G mcp mcp
+USER mcp:mcp
+COPY --from=builder /out/mcp-${SERVER} /usr/local/bin/mcp-server
+ENTRYPOINT ["/usr/local/bin/mcp-server"]
