@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 BIN=$ROOT_DIR/bin/mcp-redis
-ADDR=${REDIS_TEST_ADDR:-127.0.0.1:56379}
+ADDR=${REDIS_ADDR:-${REDIS_TEST_ADDR:-127.0.0.1:56379}}
 
 if [ ! -x "$BIN" ]; then
     (cd "$ROOT_DIR/servers/redis" && go build -o "$BIN" .)

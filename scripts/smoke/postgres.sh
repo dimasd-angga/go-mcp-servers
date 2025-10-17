@@ -6,7 +6,7 @@ set -euo pipefail
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 BIN=$ROOT_DIR/bin/mcp-postgres
 
-DSN=${POSTGRES_TEST_DSN:-postgres://mcptest:mcptest@127.0.0.1:55432/mcptest?sslmode=disable}
+DSN=${POSTGRES_DSN:-${POSTGRES_TEST_DSN:-postgres://mcptest:mcptest@127.0.0.1:55432/mcptest?sslmode=disable}}
 
 if [ ! -x "$BIN" ]; then
     (cd "$ROOT_DIR/servers/postgres" && go build -o "$BIN" .)

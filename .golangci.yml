@@ -23,6 +23,7 @@ linters-settings:
   gosec:
     excludes:
       - G104  # noisy; errcheck covers it
+      - G306  # 0644 is intentional for user-facing filesystem MCP server
 issues:
   exclude-rules:
     - path: _test\.go
