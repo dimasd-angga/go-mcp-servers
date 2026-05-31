@@ -119,6 +119,34 @@ func main() {
 
 ## Architecture
 
+```mermaid
+flowchart LR
+    Host["MCP host<br/>Claude Desktop / Cursor / custom Go agent"]
+    Transport["JSON-RPC 2.0<br/>stdio or SSE"]
+
+    Host --> Transport
+    Transport --> Filesystem["mcp-filesystem binary"]
+    Transport --> Postgres["mcp-postgres binary"]
+    Transport --> Redis["mcp-redis binary"]
+    Transport --> Shell["mcp-shell binary"]
+    Transport --> HTTP["mcp-http binary"]
+    Transport --> HomeAssistant["mcp-homeassistant binary"]
+
+    Filesystem --> FS["Filesystem root"]
+    Postgres --> PG["Postgres database"]
+    Redis --> RD["Redis instance"]
+    Shell --> SH["Sandboxed shell"]
+    HTTP --> API["HTTP endpoints"]
+    HomeAssistant --> HA["Home Assistant API"]
+
+    Filesystem -. logs .-> Stderr["stderr"]
+    Postgres -. logs .-> Stderr
+    Redis -. logs .-> Stderr
+    Shell -. logs .-> Stderr
+    HTTP -. logs .-> Stderr
+    HomeAssistant -. logs .-> Stderr
+```
+
 ```
 MCP host (Claude Desktop / Cursor / your Go agent)
          │
