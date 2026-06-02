@@ -16,9 +16,9 @@ func (fsrv *FilesystemServer) registerSearchFiles() {
 	fsrv.mcp.AddTool(
 		mcp.NewTool("search_files",
 			mcp.WithDescription("Find files under FS_ROOT matching a glob pattern. "+
-				"Patterns are matched against both relative path and filename "+
-				"(so '*.go' and 'src/*.go' both work). Returns one path per line."),
-			mcp.WithString("pattern", mcp.Required(), mcp.Description("Glob pattern, e.g. '*.go'")),
+				"Supports multi-segment globs (e.g. '**/*.go' matches Go files at any depth). "+
+				"Patterns are matched against the relative path of each file. Returns one path per line."),
+			mcp.WithString("pattern", mcp.Required(), mcp.Description("Glob pattern, e.g. '**/*.go' or 'src/*.go'")),
 		),
 		fsrv.searchFiles,
 	)
