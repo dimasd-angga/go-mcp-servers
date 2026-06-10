@@ -293,8 +293,29 @@ func TestSearchFiles_Glob(t *testing.T) {
 	write(t, root, "sub/helper.go", "y")
 	write(t, root, "README.md", "z")
 	got := testutil.CallTool(t, c, "search_files", map[string]any{"pattern": "*.go"})
-	if !strings.Contains(got, "main.go") || !strings.Contains(got, "sub/helper.go") {
+	if !strings.Contains(got, "main.go") {
 		t.Errorf("missing matches: %s", got)
+	}
+	// *.go does not cross directory separators; use **/*.go for deep matching
+	if strings.Contains(got, "sub/helper.go") {
+		t.Errorf("*.go should not match across directories: %s", got)
+	}
+	if strings.Contains(got, "README.md") {
+		t.Errorf("non-go file matched: %s", got)
+	}
+}
+
+func TestSearchFiles_DeepGlob(t *testing.T) {
+	c, root := setup(t)
+	write(t, root, "main.go", "x")
+	write(t, root, "pkg/util.go", "y")
+	write(t, root, "pkg/sub/helper.go", "z")
+	write(t, root, "README.md", "w")
+	got := testutil.CallTool(t, c, "search_files", map[string]any{"pattern": "**/*.go"})
+	for _, want := range []string{"main.go", "pkg/util.go", "pkg/sub/helper.go"} {
+		if !strings.Contains(got, want) {
+			t.Errorf("want %q in deep-glob output, got: %s", want, got)
+		}
 	}
 	if strings.Contains(got, "README.md") {
 		t.Errorf("non-go file matched: %s", got)
