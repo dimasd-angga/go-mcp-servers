@@ -22,6 +22,7 @@ Read and control Home Assistant entities via the HA REST API. Designed for perso
 | `HA_URL` | yes | – | HA base URL, e.g. `http://homeassistant.local:8123`. Trailing `/` stripped. |
 | `HA_TOKEN` | yes | – | Long-lived access token from HA → profile → Security. |
 | `HA_TIMEOUT` | no | `10` | Per-request timeout in seconds. |
+| `HA_STATES_CACHE_TTL` | no | `5` | Seconds to cache `/api/states` responses shared by `get_states` and `list_automations`; `0` disables caching. |
 | `LOG_LEVEL` | no | `info` | `debug` for verbose. |
 
 ## Claude Desktop config

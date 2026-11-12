@@ -39,7 +39,7 @@ func (h *HAServer) addGetStates() {
 		),
 		func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 			domain, _ := req.GetArguments()["domain"].(string)
-			status, body, err := h.callAPI(ctx, "GET", "/api/states", nil)
+			status, body, err := h.getStates(ctx)
 			if err != nil {
 				return mcp.NewToolResultError(fmt.Sprintf("api: %v", err)), nil
 			}
@@ -211,7 +211,7 @@ func (h *HAServer) addListAutomations() {
 			mcp.WithDescription("List automations and their on/off state. Backed by get_states with domain=automation."),
 		),
 		func(ctx context.Context, _ mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-			status, body, err := h.callAPI(ctx, "GET", "/api/states", nil)
+			status, body, err := h.getStates(ctx)
 			if err != nil {
 				return mcp.NewToolResultError(fmt.Sprintf("api: %v", err)), nil
 			}
